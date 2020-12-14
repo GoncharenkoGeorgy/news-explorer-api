@@ -8,16 +8,8 @@
     "dev": "nodemon app.js",
     "lint": "eslint ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/GoncharenkoGeorgy/news-explorer-api.git"
-  },
   "author": "Georgy Goncharenko",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/GoncharenkoGeorgy/news-explorer-api/issues"
-  },
-  "homepage": "https://github.com/GoncharenkoGeorgy/news-explorer-api#readme",
   "devDependencies": {
     "eslint": "^7.15.0",
     "eslint-config-airbnb-base": "^14.2.1",
