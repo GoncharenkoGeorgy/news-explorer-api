@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose');
 const mongoose = require('mongoose');
+const isURL = require('validator/lib/isURL');
 
 const articleSchema = new Schema({
   keyword: {
@@ -26,9 +27,7 @@ const articleSchema = new Schema({
     type: String,
     required: true,
     validate: {
-      validator(v) {
-        return /^https?:\/\/(www\.)?[\w-.~:/?#[\]@!$&'()*+,;=]+#?$/.test(v);
-      },
+      validator: (v) => isURL(v),
       message: 'Ссылка введена неверно',
     },
   },
@@ -36,9 +35,7 @@ const articleSchema = new Schema({
     type: String,
     required: true,
     validate: {
-      validator(v) {
-        return /^https?:\/\/(www\.)?[\w-.~:/?#[\]@!$&'()*+,;=]+#?$/.test(v);
-      },
+      validator: (v) => isURL(v),
       message: 'Ссылка введена неверно',
     },
   },

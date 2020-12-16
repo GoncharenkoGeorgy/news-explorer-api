@@ -10,17 +10,19 @@ const { JWT_SECRET, NODE_ENV } = process.env;
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, email, password,
   } = req.body;
+  // const { id } = req.user._id;
+  if (!name || !email || !password) {
+    throw new BadRequestError('Переданы не все данные');
+  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
-      about,
-      avatar,
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ data: { id: user._id, name: user.name, email: user.email } }))
     // данные не записались, вернём ошибку
     .catch((err) => {
       if (err.name === 'ValidationError') {

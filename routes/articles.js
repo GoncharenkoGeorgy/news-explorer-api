@@ -3,10 +3,17 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getArticles, createArticle, deleteArticle,
 } = require('../controllers/articles.js');
+const auth = require('../middlewares/auth.js');
 
-router.get('/articles', getArticles);
+router.delete('/articles/:id', auth, celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().alphanum().length(24).hex(),
+  }),
+}), deleteArticle);
 
-router.post('/articles', celebrate({
+router.get('/articles', auth, getArticles);
+
+router.post('/articles', auth, celebrate({
   body: Joi.object().keys({
     keyword: Joi.string().required(),
     title: Joi.string().required(),
@@ -17,11 +24,5 @@ router.post('/articles', celebrate({
     image: Joi.string().required().uri(),
   }),
 }), createArticle);
-
-router.delete('/articles/:id', celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().alphanum().length(24).hex(),
-  }),
-}), deleteArticle);
 
 module.exports = router;

@@ -1,8 +1,8 @@
 const Article = require('../models/article.js');
 
-const { BadRequestError } = require('../errors/bad-req-err.js');
-const { ForbiddenError } = require('../errors/forbidden-err.js');
-const { NotFoundError } = require('../errors/not-found-err.js');
+const BadRequestError = require('../errors/bad-req-err.js');
+const ForbiddenError = require('../errors/forbidden-err.js');
+const NotFoundError = require('../errors/not-found-err.js');
 
 const getArticles = (req, res, next) => {
   Article.find({})
@@ -26,6 +26,7 @@ const createArticle = (req, res, next) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
+      // if (err.statusCode === 400) {
         throw new BadRequestError('Переданы некорректные данные');
       }
     })
@@ -33,27 +34,24 @@ const createArticle = (req, res, next) => {
 };
 
 const deleteArticle = (req, res, next) => {
-  const { id } = req.params;
-  const { _id } = req.user;
-  Article.findById(id).select('+owner')
-    .then((data) => {
-      if (data.owner.toString() !== _id) {
+  // const { id } = req.params;
+  // const { _id } = req.user;
+  Article.findById(req.params.id).select('+owner')
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Авторизуйтесь для удаления');
       }
-      return Article.findByIdAndDelete(id)
-        .then((card) => {
-          if (!card) {
-            throw new NotFoundError('Неправильный запрос');
-          }
-          return res.send({ message: 'Статья успешно удалена' });
+      return Article.findByIdAndRemove(req.params.id)
+        .then(() => {
+          res.send({ message: 'Статья успешно удалена' });
         })
         .catch((err) => {
-          next(err);
+          if (err.name === 'CastError' || err.name === 'DocumentNotFoundError') {
+            throw new NotFoundError('Карточка с таким id не найдена');
+          }
         });
     })
-    .catch(() => {
-      throw new NotFoundError('Неправильный запрос статьи для ее удаления');
-    });
+    .catch(next);
 };
 
 module.exports = {
