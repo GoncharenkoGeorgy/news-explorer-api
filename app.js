@@ -22,7 +22,6 @@ mongoose.connect(MNG_URL, {
 });
 
 app.use(helmet());
-app.use(rateLimiter);
 
 app.use(requestLogger);
 
@@ -40,6 +39,7 @@ app.use(express.json());
 app.use('/', routes);
 
 app.use(errorLogger);
+app.use(rateLimiter);
 
 app.use(errors()); // обработчик ошибок celebrate
 

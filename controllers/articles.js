@@ -23,33 +23,42 @@ const createArticle = (req, res, next) => {
   Article.create({
     keyword, title, text, date, source, link, image, owner: _id,
   })
-    .then((card) => res.send(card))
+    .then((article) => res.send({
+      data: {
+        id: article.id,
+        keyword: article.keyword,
+        title: article.title,
+        text: article.text,
+        date: article.date,
+        source: article.source,
+        link: article.link,
+        image: article.image,
+      },
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-      // if (err.statusCode === 400) {
         throw new BadRequestError('Переданы некорректные данные');
+      } else {
+        next(err);
       }
     })
     .catch(next);
 };
 
 const deleteArticle = (req, res, next) => {
-  // const { id } = req.params;
-  // const { _id } = req.user;
   Article.findById(req.params.id).select('+owner')
-    .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
+    .then((article) => {
+      if (!article) {
+        throw new NotFoundError('Карточка с таким id не найдена');
+      }
+      if (article.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Авторизуйтесь для удаления');
       }
       return Article.findByIdAndRemove(req.params.id)
         .then(() => {
           res.send({ message: 'Статья успешно удалена' });
         })
-        .catch((err) => {
-          if (err.name === 'CastError' || err.name === 'DocumentNotFoundError') {
-            throw new NotFoundError('Карточка с таким id не найдена');
-          }
-        });
+        .catch(next);
     })
     .catch(next);
 };

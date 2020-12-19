@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, CelebrateError } = require('celebrate');
+const validator = require('validator');
 const {
   getArticles, createArticle, deleteArticle,
 } = require('../controllers/articles.js');
@@ -13,6 +14,13 @@ router.delete('/articles/:id', auth, celebrate({
 
 router.get('/articles', auth, getArticles);
 
+const urlValidation = (value) => {
+  if (!validator.isURL(value)) {
+    throw new CelebrateError('Некорректный URL');
+  }
+  return value;
+};
+
 router.post('/articles', auth, celebrate({
   body: Joi.object().keys({
     keyword: Joi.string().required(),
@@ -20,8 +28,8 @@ router.post('/articles', auth, celebrate({
     text: Joi.string().required(),
     date: Joi.string().required(),
     source: Joi.string().required(),
-    link: Joi.string().required().uri(),
-    image: Joi.string().required().uri(),
+    link: Joi.string().required().custom(urlValidation),
+    image: Joi.string().required().custom(urlValidation),
   }),
 }), createArticle);
 

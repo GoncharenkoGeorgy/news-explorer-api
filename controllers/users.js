@@ -29,6 +29,8 @@ const createUser = (req, res, next) => {
         throw new BadRequestError('Переданы некорректные данные');
       } else if (err.name === 'MongoError') {
         throw new ConflictError('Пользователь с таким email уже зарегистрирован');
+      } else {
+        next(err);
       }
     })
     .catch(next);
