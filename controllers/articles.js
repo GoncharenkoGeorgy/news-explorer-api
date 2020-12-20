@@ -50,7 +50,7 @@ const deleteArticle = (req, res, next) => {
     .then((article) => {
       if (!article) {
         throw new NotFoundError('Карточка с таким id не найдена');
-      }
+      } else
       if (article.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Авторизуйтесь для удаления');
       }
